@@ -6,10 +6,25 @@ needed parameters: fs, res, n_chan, sig_meas
 
 import os, sys, audioop, ossaudiodev, wave
 
+def audio_open():
 
-# Open 2 file handles
-dspout = ossaudiodev.open('/dev/dsp', 'w')
-dspin = ossaudiodev.open('/dev/dsp', 'r')
+    global dspout
+    global dspin
+
+    # Open 2 file handles
+    dspout = ossaudiodev.open('/dev/dsp', 'w')
+    dspin = ossaudiodev.open('/dev/dsp', 'r')
+
+
+
+def audio_close():
+
+    global dspout
+    global dspin
+
+    dspout.close()
+    dspin.close()
+
 
 
 def audio_init(fs,n_chan):
@@ -37,6 +52,7 @@ def audio_stereo_out(sig_meas):
 
 def audio_in():
     sys_resp = dspin.read(512)
+    return sys_resp
 
 
 def audio_run(n_chan,sig_meas):
@@ -45,8 +61,8 @@ def audio_run(n_chan,sig_meas):
     else :
         audio_mono_out(sig_meas)
     
-    audio_in()
-
+    rec = audio_in()
+    return rec
 
 def list_to_wav(sig_list):
     output_signal= ''
@@ -59,6 +75,11 @@ def list_to_wav(sig_list):
 def meas_run(fs,n_chan,sig_list):
 
     m_sig=list_to_wav(sig_list)
+    audio_open()
     audio_init(fs,n_chan)
-    audio_run(n_chan,m_sig)
+    sys_rec = audio_run(n_chan,m_sig)
+    audio_close()
+
+    return sys_rec
+    
 
