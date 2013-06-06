@@ -1,3 +1,8 @@
+"""
+Library for the MLS measuring method
+Creates the MLS and calculates the Impulse Response from the System Response
+required Parameters: fs, rt60, n_meas
+"""
 def lfsr(seed, taps):
     sr, xor = seed, 0
     seqn = []
