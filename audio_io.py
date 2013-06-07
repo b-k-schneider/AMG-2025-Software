@@ -47,13 +47,17 @@ def audio_mono_out(sig_meas):
 
 def audio_stereo_out(sig_meas):
 
-    #converts the signal to a mono signal
+    #converts the signal to a stereo signal
     stereoaudio = audioop.tostereo(sig_meas, 2, 1, 1)
+    sna=len(stereoaudio)
+    print sna
     dspout.write(stereoaudio)
 
-def audio_in(len_sp):
+def audio_in(len_sp,n_chan):
     #records len_sp bytes from oss device
-    sys_resp = dspin.read(len_sp)
+    sys_resp=''
+    for i in range(len_sp):
+        sys_resp += dspin.read(16*n_chan*64)
     return sys_resp
 
 
@@ -65,7 +69,7 @@ def audio_run(n_chan,sig_meas,len_sp):
     else :
         audio_mono_out(sig_meas)
     
-    rec = audio_in(len_sp)
+    rec = audio_in(len_sp,n_chan)
     return rec
 
 def list_to_wav(sig_list):
@@ -77,10 +81,10 @@ def list_to_wav(sig_list):
 
 
 
-def meas_run(fs,n_chan,sig_list,len_r):
+def meas_run(fs,n_chan,sig_list,rt60):
 
-    #length for recording in bytes (recordlength/samplerate * 16bit * channels)
-    len_sp = int(((len_r*fs)/1000)*16*n_chan)
+    #length for recording in samples ((recordlength*samplerate)/1000)
+    len_sp = int(((2*rt60*fs)/1000)/64)
     print len_sp
     #convert list to wav struct
     m_sig = list_to_wav(sig_list)
