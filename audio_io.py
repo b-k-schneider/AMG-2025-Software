@@ -33,7 +33,7 @@ def audio_init(fs,n_chan):
 
     # Configure OSS Device Resolution, Mono/Stereo, Samplerate, non-Blocking Mode
     fmt_o_err = dspout.setfmt(ossaudiodev.AFMT_S16_BE)
-    fmt_i_err = dspin.setfmt(ossaudiodev.AFMT_S16_BE)
+    fmt_i_err = dspin.setfmt(ossaudiodev.AFMT_S16_LE)
 
     ch_o_err = dspout.channels(n_chan)
     ch_i_err = dspin.channels(n_chan)
@@ -57,20 +57,32 @@ def audio_in(len_sp,n_chan):
     #records len_sp bytes from oss device
     sys_resp=''
     for i in range(len_sp):
-        sys_resp += dspin.read(16*n_chan*64)
+        sys_resp += dspin.read(16*n_chan*256)
+    
+    # save .wav file
+    sf = wave.open("/tmp/wave.wav", 'w')
+    sf.setparams((2, 2, 44100, 0, 'NONE', 'no compression'))
+    sf.writeframesraw(sys_resp)
+    sf.close()
+
+    #TODO scipy from wave to array!
+    
     return sys_resp
 
 
 def audio_run(n_chan,sig_meas,len_sp):
 
     #starts the audio output and recording
+    
+
     if n_chan == 2:
         audio_stereo_out(sig_meas)
     else :
         audio_mono_out(sig_meas)
-    
+
     rec = audio_in(len_sp,n_chan)
-    return rec
+    
+    return 
 
 def list_to_wav(sig_list):
     # converts list data to wav struct, to be usable for oss device
@@ -84,7 +96,7 @@ def list_to_wav(sig_list):
 def meas_run(fs,n_chan,sig_list,rt60):
 
     #length for recording in samples ((recordlength*samplerate)/1000)
-    len_sp = int(((2*rt60*fs)/1000)/64)
+    len_sp = int(((2*rt60*fs)/1000)/256)
     print len_sp
     #convert list to wav struct
     m_sig = list_to_wav(sig_list)
