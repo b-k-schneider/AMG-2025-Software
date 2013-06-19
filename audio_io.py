@@ -32,7 +32,7 @@ def audio_init(fs,n_chan):
 
 
     # Configure OSS Device Resolution, Mono/Stereo, Samplerate, non-Blocking Mode
-    fmt_o_err = dspout.setfmt(ossaudiodev.AFMT_S16_BE)
+    fmt_o_err = dspout.setfmt(ossaudiodev.AFMT_S16_LE)
     fmt_i_err = dspin.setfmt(ossaudiodev.AFMT_S16_LE)
 
     ch_o_err = dspout.channels(n_chan)
@@ -42,16 +42,35 @@ def audio_init(fs,n_chan):
     fs_i_err = dspin.speed(fs)
     
 
+
 def audio_mono_out(sig_meas):
+    
+    # save .wav file
+    sf = wave.open("/tmp/meas_mono.wav", 'w')
+    sf.setparams((2, 1, 44100, 0, 'NONE', 'no compression'))
+    sf.writeframesraw(sig_meas)
+    sf.close()
+
     dspout.write(sig_meas)
+
 
 def audio_stereo_out(sig_meas):
 
     #converts the signal to a stereo signal
     stereoaudio = audioop.tostereo(sig_meas, 2, 1, 1)
-    sna=len(stereoaudio)
-    print sna
+    #sna=len(stereoaudio)
+    #print sna
+
+    # save .wav file
+    sf = wave.open("/tmp/meas_stereo.wav", 'w')
+    sf.setparams((2, 2, 44100, 0, 'NONE', 'no compression'))
+    sf.writeframesraw(stereoaudio)
+    sf.close()
+
+
     dspout.write(stereoaudio)
+
+
 
 def audio_in(len_sp,n_chan):
     #records len_sp bytes from oss device
@@ -59,13 +78,7 @@ def audio_in(len_sp,n_chan):
     for i in range(len_sp):
         sys_resp += dspin.read(16*n_chan*256)
     
-    # save .wav file
-    sf = wave.open("/tmp/wave.wav", 'w')
-    sf.setparams((2, 2, 44100, 0, 'NONE', 'no compression'))
-    sf.writeframesraw(sys_resp)
-    sf.close()
 
-    #TODO scipy from wave to array!
     
     return sys_resp
 
@@ -82,19 +95,26 @@ def audio_run(n_chan,sig_meas,len_sp):
 
     rec = audio_in(len_sp,n_chan)
     
-    return 
+    return rec
+
+
 
 def list_to_wav(sig_list):
+
     # converts list data to wav struct, to be usable for oss device
+
     output_signal= ''
+
     for j in range(len(sig_list)):
-        output_signal += wave.struct.pack('h', sig_list[j])
+        output_signal += wave.struct.pack('<h', (sig_list[j]*29204))
     return output_signal
 
 
 
 def meas_run(fs,n_chan,sig_list,rt60):
 
+    sys_rec=''
+    
     #length for recording in samples ((recordlength*samplerate)/1000)
     len_sp = int(((2*rt60*fs)/1000)/256)
     print len_sp
@@ -107,6 +127,11 @@ def meas_run(fs,n_chan,sig_list,rt60):
     sys_rec = audio_run(n_chan,m_sig,len_sp)
     audio_close()
 
+    # save .wav file
+    sf = wave.open("/tmp/wave.wav", 'w')
+    sf.setparams((2, 2, 44100, 0, 'NONE', 'no compression'))
+    sf.writeframesraw(sys_rec)
+    sf.close()
     return sys_rec
     
 
