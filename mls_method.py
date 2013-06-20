@@ -3,6 +3,9 @@ Library for the MLS measuring method
 Creates the MLS and calculates the Impulse Response from the System Response
 required Parameters: fs, rt60, n_meas
 """
+
+import numpy, scipy
+
 def lfsr(seed, taps):
     sr, xor = seed, 0
     seqn = []
@@ -26,23 +29,30 @@ def lfsr(seed, taps):
             break
 
 def mls_gen(rt60, fs):
+    # rt60 in msec, fs in hz
     import math
 
     seed=0
     
-    # rt60 in msec, fs in hz
+    # time length, twice as long as rt60 in sec
 
-    t_len = rt60/500.0 # time length, twice as long as rt60 in sec
+    t_len = rt60/500.0 
 
-    s_len = t_len*fs # sample length, time length * sampling frequency
+    # sample length, time length * sampling frequency
 
-    n_taps =int(round(math.log(s_len,2)+0.5)) # length of shift register rounded up
-    print n_taps
+    s_len = t_len*fs 
+
+    # length of shift register rounded up
+
+    n_taps =int(round(math.log(s_len,2)+0.5)) 
+    #DEBUG print n_taps
     i=0
 
-    while i<n_taps : # Creating and filling the seed 
+    # Creating and filling the seed
+    
+    while i<n_taps :  
         seed=seed+pow(10,i)
-        # debug print seed
+        #DEBUG print seed
         i=i+1
 
     # taps_list taken from "Messung von Impulseantworten mit Pseudo-Noise Sequenzen"
@@ -62,5 +72,16 @@ def mls_gen(rt60, fs):
     mls=lfsr(str(seed),taps_list[n_taps])
 
     return mls
+
+def compute_ir(resp_l, resp_r, meas_l, meas_r):
+
+    # if mono, only leftchannels are used
+
+    # crosscorrelation of measurement signal and system response
+
+    # savin IR in array
+
+
+    return sys_ir
 
     

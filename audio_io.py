@@ -58,8 +58,8 @@ def audio_stereo_out(sig_meas):
 
     #converts the signal to a stereo signal
     stereoaudio = audioop.tostereo(sig_meas, 2, 1, 1)
-    #sna=len(stereoaudio)
-    #print sna
+    #DEBUG sna=len(stereoaudio)
+    #DEBUG print sna
 
     # save .wav file
     sf = wave.open("/tmp/meas_stereo.wav", 'w')
@@ -106,13 +106,15 @@ def list_to_wav(sig_list):
     output_signal= ''
 
     for j in range(len(sig_list)):
-        output_signal += wave.struct.pack('<h', (sig_list[j]*29204))
+        output_signal += wave.struct.pack('<h', (sig_list[j]*32767))
     return output_signal
 
 
 def extract_channels(n_chan):
 
     #extracts data out of both wavefiles into 4 arrays
+
+    #splitting of the tuple
     if n_chan == 2:
         fs,meas_array = scipy.io.wavfile.read("/tmp/meas_stereo.wav")
     else :
@@ -120,26 +122,32 @@ def extract_channels(n_chan):
 
     fs,resp_array = scipy.io.wavfile.read("/tmp/sysresp.wav")
 
+
+    #creation of empty arrays
     resp_l=numpy.zeros(len(resp_array))
     resp_r=numpy.zeros(len(resp_array))
     meas_l=numpy.zeros(len(meas_array))
     meas_r=numpy.zeros(len(meas_array))
 
-
-    if n_chan == 2:
     
+    if n_chan == 2:
+
+        # splitting into channels
+        # and converting from 16bit INT to Float
         for i in xrange(len(resp_array)):
-            resp_l[i] =resp_array[i,0]
-            resp_r[i] =resp_array[i,1]    
+            resp_l[i] =(resp_array[i,0]/32767.0)
+            resp_r[i] =(resp_array[i,1]/32767.0)    
 
         for i in xrange(len(meas_array)):
-            meas_l[i] =meas_array[i,0]
-            meas_r[i] =meas_array[i,1]
+            meas_l[i] =(meas_array[i,0]/32767.0)
+            meas_r[i] =(meas_array[i,1]/32767.0)
 
     else:
-
-        resp_l =resp_array
-        meas_l =meas_array
+        
+        # mono got only one channel
+        
+        resp_l =(resp_array/32767.0)
+        meas_l =(meas_array/32767.0)
 	
     return (resp_l, resp_r, meas_l, meas_r)
     
@@ -151,7 +159,7 @@ def meas_run(fs,n_chan,sig_list,rt60):
     
     #length for recording in samples ((recordlength*samplerate)/1000)
     len_sp = int(((2*rt60*fs)/1000)/256)
-    print len_sp
+    #DEBUG print len_sp
     #convert list to wav struct
     m_sig = list_to_wav(sig_list)
 
