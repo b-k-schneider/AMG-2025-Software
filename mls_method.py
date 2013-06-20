@@ -77,11 +77,13 @@ def compute_ir(resp_l, resp_r, meas_l, meas_r):
 
     # if mono, only leftchannels are used
 
+    # synchronisation of measurement signal and system response?
+    
     # crosscorrelation of measurement signal and system response
-
     # savin IR in array
-
-
-    return sys_ir
+    ir_l=numpy.correlate(resp_l, meas_l, "same")
+    ir_r=numpy.correlate(resp_r, meas_r, "same")
+    
+    return (ir_l, ir_r)
 
     
