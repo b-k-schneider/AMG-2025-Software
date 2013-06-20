@@ -4,7 +4,7 @@ needs native OSS or emulated via aoss or padsp
 needed parameters: fs, res, n_chan, sig_meas
 """
 
-import os, sys, audioop, ossaudiodev, wave, numpy
+import os, sys, audioop, ossaudiodev, wave, numpy, scipy.io.wavfile
 
 def audio_open():
 
@@ -110,10 +110,44 @@ def list_to_wav(sig_list):
     return output_signal
 
 
+def extract_channels(n_chan):
+
+    #extracts data out of both wavefiles into 4 arrays
+    if n_chan == 2:
+        fs,meas_array = scipy.io.wavfile.read("/tmp/meas_stereo.wav")
+    else :
+        fs,meas_array = scipy.io.wavfile.read("/tmp/meas_mono.wav")
+
+    fs,resp_array = scipy.io.wavfile.read("/tmp/sysresp.wav")
+
+    resp_l=numpy.zeros(len(resp_array))
+    resp_r=numpy.zeros(len(resp_array))
+    meas_l=numpy.zeros(len(meas_array))
+    meas_r=numpy.zeros(len(meas_array))
+
+
+    if n_chan == 2:
+    
+        for i in xrange(len(resp_array)):
+            resp_l[i] =resp_array[i,0]
+            resp_r[i] =resp_array[i,1]    
+
+        for i in xrange(len(meas_array)):
+            meas_l[i] =meas_array[i,0]
+            meas_r[i] =meas_array[i,1]
+
+    else:
+
+        resp_l =resp_array
+        meas_l =meas_array
+	
+    return (resp_l, resp_r, meas_l, meas_r)
+    
+
 
 def meas_run(fs,n_chan,sig_list,rt60):
 
-    sys_rec=''
+    
     
     #length for recording in samples ((recordlength*samplerate)/1000)
     len_sp = int(((2*rt60*fs)/1000)/256)
@@ -128,10 +162,15 @@ def meas_run(fs,n_chan,sig_list,rt60):
     audio_close()
 
     # save .wav file
-    sf = wave.open("/tmp/wave.wav", 'w')
+    sf = wave.open("/tmp/sysresp.wav", 'w')
     sf.setparams((2, 2, 44100, 0, 'NONE', 'no compression'))
     sf.writeframesraw(sys_rec)
     sf.close()
-    return sys_rec
+
+    resp_l, resp_r, meas_l, meas_r=extract_channels(n_chan)
     
+  
+    return (resp_l, resp_r, meas_l, meas_r)
+    
+
 
