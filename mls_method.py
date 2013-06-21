@@ -40,12 +40,14 @@ def mls_gen(rt60, fs):
 
     # sample length, time length * sampling frequency
 
-    s_len = t_len*fs 
+    s_len = t_len*fs
+
+    print s_len
 
     # length of shift register rounded up
 
     n_taps =int(round(math.log(s_len,2)+0.5)) 
-    #DEBUG print n_taps
+    print n_taps
     i=0
 
     # Creating and filling the seed

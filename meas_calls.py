@@ -12,19 +12,29 @@ def measure_mls(fs, rt60, n_meas, n_chan):
     import mls_method, audio_io, numpy
     
     # creating MLS Signal
-    meas_sig = mls_method.mls_gen(100,44100)
+    meas_sig = mls_method.mls_gen(rt60,fs)
 
     ir_r_raw = numpy.array([])
     ir_l_raw = numpy.array([])
     
     # measuring n_meas times and averaging the IR's
     for i in xrange(n_meas):
-        
-        resp_l, resp_r, meas_l, meas_r= audio_io.meas_run(44100,2,meas_sig,100)
-        ir_l, ir_r = mls_method.compute_ir(resp_l, resp_r, meas_l, meas_r)
 
+        print("Measurement No.", i)
+        
+        resp_l, resp_r, meas_l, meas_r= audio_io.meas_run(fs,n_chan,meas_sig,rt60)
+        ir_l, ir_r= mls_method.compute_ir(resp_l, resp_r, meas_l, meas_r)
+        
+        #TODO alignment of arrays
+        if i>0:
+            max_diff_l=(ir_l_raw.argmax(axis=0) - ir_l.argmax(axis=0))
+            print max_diff_l
+
+            ir_l = numpy.roll(ir_l, max_diff_l)
+            ir_r = numpy.roll(ir_r, max_diff_l)
+            
         if len(ir_l)>len(ir_l_raw):   
-            #TODO alignment of arrays by their maximas
+            #resize the arrays and add them
             ir_l_raw.resize(ir_l.shape)
             ir_r_raw.resize(ir_r.shape)
 
