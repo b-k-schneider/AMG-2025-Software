@@ -28,7 +28,7 @@ def measure_mls(fs, rt60, n_meas, n_chan):
         #TODO alignment of arrays
         if i>0:
             max_diff_l=(ir_l_raw.argmax(axis=0) - ir_l.argmax(axis=0))
-            print max_diff_l
+            #DEBUG print max_diff_l
 
             ir_l = numpy.roll(ir_l, max_diff_l)
             ir_r = numpy.roll(ir_r, max_diff_l)
@@ -68,10 +68,18 @@ def measure_sds(fs, f_sine1, f_sine2):
     # TODO sds measurement
     return sys_resp
 
-def compute_fft(fs, meas_signal):
+def compute_fft(fs, ir):
+
+    from scipy import fftpack
+
+    sig_fft=fftpack.rfft(ir)
+    n=sig_fft.size
+    timestep=1/float(fs)
+    freq=fftpack.rfftfreq(n,d=timestep)
+    sys_fft=abs(sig_fft)
     
     # TODO FFT computing
-    return fft
+    return sys_fft, freq
 
 def plot_ir(fs, ir, filename):
     #Plots Impulse Responses as Images
@@ -84,7 +92,7 @@ def plot_ir(fs, ir, filename):
     
     return
 
-def plot_fft(fs, fft, filename):
+def plot_fft(fs, sys_fft, filename):
     #Plots FFT as Image
     
     import matplotlib.pyplot as plt

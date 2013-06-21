@@ -155,7 +155,7 @@ def meas_run(fs,n_chan,sig_list,rt60):
     
     #length for recording in samples ((recordlength*samplerate)/1000)
     len_sp = int((((2.5*rt60)/1000.0)*fs)/1024)
-    print len_sp
+    #DEBUG print len_sp
     #convert list to wav struct
     m_sig = list_to_wav(sig_list)
 

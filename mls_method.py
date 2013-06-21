@@ -42,12 +42,12 @@ def mls_gen(rt60, fs):
 
     s_len = t_len*fs
 
-    print s_len
+    #DEBUG print s_len
 
     # length of shift register rounded up
 
     n_taps =int(round(math.log(s_len,2)+0.5)) 
-    print n_taps
+    #DEBUG print n_taps
     i=0
 
     # Creating and filling the seed
@@ -79,8 +79,6 @@ def compute_ir(resp_l, resp_r, meas_l, meas_r):
 
     # if mono, only leftchannels are used
 
-    # synchronisation of measurement signal and system response?
-    
     # crosscorrelation of measurement signal and system response
     # savin IR in array
     ir_l=numpy.correlate(resp_l, meas_l, "same")
