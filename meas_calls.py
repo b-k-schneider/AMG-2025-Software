@@ -14,19 +14,35 @@ def measure_mls(fs, rt60, n_meas, n_chan):
     # creating MLS Signal
     meas_sig = mls_method.mls_gen(rt60,fs)
 
-    ir_r_raw = numpy.array([])
-    ir_l_raw = numpy.array([])
-
-    #open audio device
+    # open audio device
     audio_io.audio_open(fs,n_chan)
-    
-    # measuring n_meas times and averaging the IR's
+
     for i in xrange(n_meas):
 
         print("Measurement No.", i)
         
-        resp_l, resp_r, meas_l, meas_r= audio_io.meas_run(fs,n_chan,meas_sig,rt60)
-        ir_l, ir_r= mls_method.compute_ir(resp_l, resp_r, meas_l, meas_r)
+        audio_io.meas_run(fs,n_chan,meas_sig,rt60,i)
+    
+
+    ir_l_avg, ir_r_avg = average_ir(n_meas, n_chan)
+    
+    #closing audio device
+    audio_io.audio_close()
+
+    return (ir_l_avg, ir_r_avg)
+
+def average_ir(n_meas, n_chan):
+
+    import mls_method, audio_io, numpy, time
+
+    ir_r_raw = numpy.array([])
+    ir_l_raw = numpy.array([])
+    
+    for i in xrange(n_meas):
+
+        print "Processing Response No",i
+        
+        ir_l, ir_r= mls_method.compute_ir(n_chan, i)
         
         #TODO alignment of arrays
         if i>0:
@@ -51,17 +67,15 @@ def measure_mls(fs, rt60, n_meas, n_chan):
             ir_l_raw += ir_l
             ir_r_raw += ir_r
             
-        del(resp_l, resp_r, meas_l, meas_r, ir_l, ir_r)
+        del(ir_l, ir_r)
         
     ir_l_avg = ir_l_raw/float(n_meas)
     ir_r_avg = ir_r_raw/float(n_meas)
 
     del(ir_l_raw, ir_r_raw)
 
-    #closing audio device
-    audio_io.audio_close()
-
     return (ir_l_avg, ir_r_avg)
+
 
 def measure_ess(fs, n_meas, n_chan, f_start, f_stop, t_sweep):
 

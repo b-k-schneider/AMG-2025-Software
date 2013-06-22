@@ -75,10 +75,15 @@ def mls_gen(rt60, fs):
 
     return mls
 
-def compute_ir(resp_l, resp_r, meas_l, meas_r):
+def compute_ir(n_chan, index):
 
+    import audio_io
     # if mono, only leftchannels are used
 
+    
+    #Extracting Channels
+    resp_l, resp_r, meas_l, meas_r=audio_io.extract_channels(n_chan,index)
+    
     # crosscorrelation of measurement signal and system response
     # savin IR in array
     ir_l=numpy.correlate(resp_l, meas_l, "same")
