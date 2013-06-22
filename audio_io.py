@@ -11,11 +11,20 @@ import os, sys, audioop, ossaudiodev, wave, numpy, scipy.io.wavfile, pyaudio
 def audio_open(fs,n_chan):
     global pya
     global stream
+    global sys_wav
+    global FORMAT
     FORMAT = pyaudio.paInt16
+    global chunk
     chunk=1024
-
-    pya= pyaudio.PyAudio()
     
+
+    print("Instanting PyAudio")
+    
+    pya= pyaudio.PyAudio()
+
+    print("Opening Audio Device")
+
+        
     stream = pya.open(format = FORMAT,
                                     channels = n_chan,
                                     rate = fs,
@@ -25,31 +34,45 @@ def audio_open(fs,n_chan):
                                     input_device_index = 1,
                                     output_device_index = 1)
     
+    print("Audio Device Opened...")
+
+    stream.start_stream()
+
+    
+        
 
 
 def audio_close():
 
     global stream
+    global stream
     global pya
-    stream.close()
+        
+    stream.stop_stream()
+    
     pya.terminate()
 
+    print("Audio Device Closed...")
 
-    
 
+def audio_mono_out(sig_meas,fs,n_chan):
 
-def audio_mono_out(sig_meas):
+    global stream
+
     
     # save .wav file
     sf = wave.open("/tmp/meas_mono.wav", 'w')
-    sf.setparams((2, 1, 44100, 0, 'NONE', 'no compression'))
+    sf.setparams((2, n_chan, fs, 0, 'NONE', 'no compression'))
     sf.writeframesraw(sig_meas)
     sf.close()
 
     stream.write(sig_meas)
+    
 
+def audio_stereo_out(sig_meas,fs,n_chan):
 
-def audio_stereo_out(sig_meas):
+    global stream
+
     
 
     #converts the signal to a stereo signal
@@ -59,39 +82,52 @@ def audio_stereo_out(sig_meas):
 
     # save .wav file
     sf = wave.open("/tmp/meas_stereo.wav", 'w')
-    sf.setparams((2, 2, 44100, 0, 'NONE', 'no compression'))
+    sf.setparams((2, n_chan, fs, 0, 'NONE', 'no compression'))
     sf.writeframesraw(stereoaudio)
     sf.close()
 
-
     stream.write(stereoaudio)
-
-
-
-def audio_in(len_sp,n_chan):
-    #records len_sp bytes from oss device
-    sys_resp=''
-    for i in range(len_sp):
-        sys_resp += stream.read(1024)
     
 
+
+
+def audio_in(rt60,fs,n_chan):
+
+    global stream
+    global sys_wav
+    import time
+
+    frames = []
+
+    for i in range(0, int(fs / 1024*(2.5*rt60/1000.0))):
+        data = stream.read(1024)
+        frames.append(data)
     
-    return sys_resp
+    # recording to .wav file
+    sys_wav = wave.open("/tmp/sysresp.wav", 'w')
+    sys_wav.setparams((2, n_chan, fs, 0, 'NONE', 'no compression'))
+    sys_wav.writeframes(b''.join(frames))
+    sys_wav.close()
+
+    del(frames)
+    
+    
+    return 
 
 
-def audio_run(n_chan,sig_meas,len_sp):
+def audio_run(n_chan,sig_meas,rt60,fs):
 
     #starts the audio output and recording
     
 
     if n_chan == 2:
-        audio_stereo_out(sig_meas)
+        audio_stereo_out(sig_meas,fs,n_chan)
     else :
-        audio_mono_out(sig_meas)
+        audio_mono_out(sig_meas,fs,n_chan)
 
-    rec = audio_in(len_sp,n_chan)
+    audio_in(rt60,fs,n_chan)
     
-    return rec
+    return 
 
 
 
@@ -103,6 +139,7 @@ def list_to_wav(sig_list):
     # scaling to -1dB signal ((2^16)/2)*-1dB
     for j in range(len(sig_list)):
         output_signal += wave.struct.pack('<h', (sig_list[j]*29205))
+    print ("Signal converted")
     return output_signal
 
 
@@ -120,10 +157,10 @@ def extract_channels(n_chan):
 
 
     #creation of empty arrays
-    resp_l=numpy.zeros(len(resp_array))
-    resp_r=numpy.zeros(len(resp_array))
-    meas_l=numpy.zeros(len(meas_array))
-    meas_r=numpy.zeros(len(meas_array))
+    resp_l=numpy.empty(len(resp_array))
+    resp_r=numpy.empty(len(resp_array))
+    meas_l=numpy.empty(len(meas_array))
+    meas_r=numpy.empty(len(meas_array))
 
     
     if n_chan == 2:
@@ -152,24 +189,16 @@ def extract_channels(n_chan):
 def meas_run(fs,n_chan,sig_list,rt60):
 
     
-    
     #length for recording in samples ((recordlength*samplerate)/1000)
     len_sp = int((((2.5*rt60)/1000.0)*fs)/1024)
     #DEBUG print len_sp
     #convert list to wav struct
     m_sig = list_to_wav(sig_list)
 
-    #audio output and recording
-    audio_open(fs,n_chan)
-    sys_rec = audio_run(n_chan,m_sig,len_sp)
-    audio_close()
+    #Playing Measurement Signal and Recordung System Response
+    audio_run(n_chan,m_sig,rt60,fs)
 
-    # save .wav file
-    sf = wave.open("/tmp/sysresp.wav", 'w')
-    sf.setparams((2, 2, 44100, 0, 'NONE', 'no compression'))
-    sf.writeframesraw(sys_rec)
-    sf.close()
-
+    #Extracting Channels
     resp_l, resp_r, meas_l, meas_r=extract_channels(n_chan)
     
   
