@@ -1,6 +1,6 @@
 """
 Library for Audio I/O via OSS (/dev/dsp)
-needs native OSS or emulated via aoss or padsp
+now with PortAudio support!!
 needed parameters: fs, res, n_chan, sig_meas
 """
 

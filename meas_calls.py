@@ -90,7 +90,7 @@ def measure_sds(fs, f_sine1, f_sine2):
 
 def compute_fft(fs, ir):
 
-    import scipy.signal
+    import scipy.signal, numpy
     from scipy import fftpack
 
     # creating asymmetric bartlett window for spectal analysis
@@ -110,7 +110,11 @@ def compute_fft(fs, ir):
     freq=fftpack.rfftfreq(n,d=timestep) 
 
     #normalizing fft
-    sys_fft=abs(sig_fft)/n 
+    sys_fft=abs(sig_fft)/n
+
+    #scaling to dB
+
+    sys_fft=20*numpy.log10(sys_fft)
     
     # TODO FFT computing
     return sys_fft, freq
@@ -141,10 +145,9 @@ def plot_save_fft(freq, sys_fft, filename):
 
     # filtering the fft by an average filter
     
-    avg_fft = scipy.signal.medfilt(sys_fft, 11)
+    avg_fft = scipy.signal.medfilt(sys_fft, 111)
 
     # TODO axis Labeling, maybe scaling to frequencies
-    plt.yscale('log')
     plt.plot(freq,avg_fft)
     plt.savefig(filename)
     
