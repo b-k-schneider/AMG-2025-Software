@@ -22,14 +22,14 @@ def measure_mls(fs, rt60, n_meas, n_chan):
         print("Measurement No.", i)
         
         audio_io.meas_run(fs,n_chan,meas_sig,rt60,i)
-    
+
+    #closing audio device
+    audio_io.audio_close()    
 
     ir_l_avg, ir_r_avg = average_ir(n_meas, n_chan)
-    
-    #closing audio device
-    audio_io.audio_close()
 
     return (ir_l_avg, ir_r_avg)
+
 
 def average_ir(n_meas, n_chan):
 
@@ -78,8 +78,32 @@ def average_ir(n_meas, n_chan):
 
 
 def measure_ess(fs, n_meas, n_chan, f_start, f_stop, t_sweep):
+    # calls the ESS Measurement
 
-    # TODO ess measurement
+    import ess_method, audio_io, numpy, time
+    
+    # creating ESS Signal
+    meas_sig = ess_method.generate_ess(fs, f_start, f_stop, t_sweep)
+
+    # open audio device
+    audio_io.audio_open(fs,n_chan)
+
+    for i in xrange(n_meas):
+
+        print("Measurement No.", i)
+
+        #t_sweep*500 is half the time to record in ms
+        audio_io.meas_run(fs,n_chan,meas_sig,int(t_sweep*500),i) 
+
+    #closing audio device
+    audio_io.audio_close()
+
+    ir_l_avg, ir_r_avg = ess_method.compute_ir(n_chan,0)
+
+    #TODO further computation
+
+
+
     return (ir_l_avg, ir_r_avg)
 
 
@@ -145,9 +169,10 @@ def plot_save_fft(freq, sys_fft, filename):
 
     # filtering the fft by an average filter
     
-    avg_fft = scipy.signal.medfilt(sys_fft, 111)
+    avg_fft = scipy.signal.medfilt(sys_fft, 333)
 
     # TODO axis Labeling, maybe scaling to frequencies
+    plt.plot(freq,sys_fft)
     plt.plot(freq,avg_fft)
     plt.savefig(filename)
     

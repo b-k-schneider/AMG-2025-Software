@@ -4,7 +4,7 @@ now with PortAudio support!!
 needed parameters: fs, res, n_chan, sig_meas
 """
 
-import os, sys, audioop, ossaudiodev, wave, numpy, scipy.io.wavfile, pyaudio
+import os, sys, audioop, wave, numpy, scipy.io.wavfile, pyaudio
 
 
 
@@ -91,8 +91,10 @@ def audio_in(rt60,fs,n_chan,index):
     frames = []
 
     filename='/tmp/data_%d.wav'%(index,)
+
+    n_frames = int(round(((fs / float(chunk)) *(2.5*rt60/1000.0))+0.5))
     
-    for i in range(0, int(fs / chunk*(3*rt60/1000.0))):
+    for i in xrange(n_frames):
         data = stream.read(chunk)
         frames.append(data)
     
@@ -110,6 +112,7 @@ def audio_in(rt60,fs,n_chan,index):
 
 def audio_run(n_chan,sig_meas,rt60,fs,index):
 
+    import thread, time
     #starts the audio output and recording
     global stream
 
@@ -119,9 +122,12 @@ def audio_run(n_chan,sig_meas,rt60,fs,index):
         audio_stereo_out(sig_meas,fs,n_chan)
     else :
         audio_mono_out(sig_meas,fs,n_chan)
+    try:
+       thread.start_new_thread(audio_in, (rt60,fs,n_chan,index))
+    except:
+       print "Error: unable to start audio in thread"
 
-    audio_in(rt60,fs,n_chan,index)
-
+    time.sleep(3*rt60/1000.0)
     stream.stop_stream()
     
     return 
