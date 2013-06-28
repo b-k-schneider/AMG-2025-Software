@@ -92,8 +92,8 @@ def measure_ess(fs, n_meas, n_chan, f_start, f_stop, t_sweep):
 
         print("Measurement No.", i)
 
-        #t_sweep*500 is half the time to record in ms
-        audio_io.meas_run(fs,n_chan,meas_sig,int(t_sweep*500),i) 
+        #t_sweep*1000 is half the time to record in ms
+        audio_io.meas_run(fs,n_chan,meas_sig,int(t_sweep*1000),i) 
 
     #closing audio device
     audio_io.audio_close()
