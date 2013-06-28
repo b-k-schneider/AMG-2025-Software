@@ -1,5 +1,5 @@
 """
-Library for Audio I/O via OSS (/dev/dsp)
+Library for Audio I/O 
 now with PortAudio support!!
 needed parameters: fs, res, n_chan, sig_meas
 """
@@ -112,7 +112,6 @@ def audio_in(rt60,fs,n_chan,index):
 
 def audio_run(n_chan,sig_meas,rt60,fs,index):
 
-    import thread, time
     #starts the audio output and recording
     global stream
 
@@ -122,12 +121,9 @@ def audio_run(n_chan,sig_meas,rt60,fs,index):
         audio_stereo_out(sig_meas,fs,n_chan)
     else :
         audio_mono_out(sig_meas,fs,n_chan)
-    try:
-       thread.start_new_thread(audio_in, (rt60,fs,n_chan,index))
-    except:
-       print "Error: unable to start audio in thread"
 
-    time.sleep(3*rt60/1000.0)
+    audio_in(rt60,fs,n_chan,index)
+    
     stream.stop_stream()
     
     return 
