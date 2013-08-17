@@ -100,14 +100,14 @@ def measure_ess(fs, n_meas, n_chan, f_start, f_stop, t_sweep):
 
     ir_l_avg, ir_r_avg = ess_method.compute_ir(n_chan,0)
 
-    #TODO further computation
+    #TODO further computation (averaging and alignment!!!)
 
 
 
     return (ir_l_avg, ir_r_avg)
 
 
-def measure_sds(fs, f_sine1, f_sine2):
+def measure_sds(fs, f_sine1, f_sine2, time):
 
     # TODO sds measurement
     return sys_resp
