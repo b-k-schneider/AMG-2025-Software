@@ -173,7 +173,7 @@ def plot_save_fft(freq, sys_fft, filename):
     avg_fft = scipy.signal.medfilt(sys_fft, 333)
 
     # TODO axis Labeling, maybe scaling to frequencies
-    plt.plot(freq,sys_fft)
+    # plt.plot(freq,sys_fft)
     plt.plot(freq,avg_fft)
     plt.savefig(filename)
     plt.clf()
