@@ -35,16 +35,23 @@ def audio_open(fs,n_chan):
                                     input_device_index = 1,
                                     output_device_index = 1)
     
+    check=pya.is_format_supported(fs,
+                            input_device=1,
+                            input_channels=n_chan,
+                            input_format=FORMAT)
+    print ("Check:",check)
+    
     print("Audio Device Opened...")
 
 def audio_close():
 
     global stream
     global pya
-    
-    pya.terminate()
-
-    print("Audio Device Closed...")
+    try:
+        pya.terminate()
+        print("Audio Device Closed...")
+    except RuntimeError:
+        print("Audio Device Closed...")
 
 
 def audio_mono_out(sig_meas,fs,n_chan):
@@ -132,7 +139,7 @@ def audio_run(n_chan,sig_meas,rt60,fs,index):
 
 def list_to_wav(sig_list):
 
-    # converts list data to wav struct, to be usable for oss device
+    # converts list data to wav struct, to be usable for device
 
     output_signal= ''
     # scaling to -1dB signal ((2^16)/2)*-1dB

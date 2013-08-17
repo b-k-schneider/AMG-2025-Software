@@ -157,6 +157,7 @@ def plot_ir(fs, ir, filename):
     # TODO axis Labeling, maybe scaling to time
     plt.plot(ir)
     plt.savefig(filename)
+    plt.clf()
     
     return
 
@@ -175,6 +176,7 @@ def plot_save_fft(freq, sys_fft, filename):
     plt.plot(freq,sys_fft)
     plt.plot(freq,avg_fft)
     plt.savefig(filename)
+    plt.clf()
     
     return
 
