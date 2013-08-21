@@ -17,7 +17,7 @@ def measure_mls(fs, rt60, n_meas, n_chan):
     # open audio device
     audio_io.audio_open(fs,n_chan)
 
-    for i in xrange(n_meas):
+    for i in xrange(n_meas+1):
 
         print("Measurement No.", i)
         
@@ -38,14 +38,17 @@ def average_ir(n_meas, n_chan):
     ir_r_raw = numpy.array([])
     ir_l_raw = numpy.array([])
     
-    for i in xrange(n_meas):
+    for i in xrange(n_meas+1):
+
+        if i==0:
+            i=1
 
         print "Processing Response No",i
         
         ir_l, ir_r= mls_method.compute_ir(n_chan, i)
         
         #TODO alignment of arrays
-        if i>0:
+        if i>1:
             max_diff_l=(ir_l_raw.argmax(axis=0) - ir_l.argmax(axis=0))
             #DEBUG print max_diff_l
 
@@ -88,7 +91,7 @@ def measure_ess(fs, n_meas, n_chan, f_start, f_stop, t_sweep):
     # open audio device
     audio_io.audio_open(fs,n_chan)
 
-    for i in xrange(n_meas):
+    for i in xrange(n_meas+1):
 
         print("Measurement No.", i)
 
@@ -98,7 +101,7 @@ def measure_ess(fs, n_meas, n_chan, f_start, f_stop, t_sweep):
     #closing audio device
     audio_io.audio_close()
 
-    ir_l_avg, ir_r_avg = ess_method.compute_ir(n_chan,0)
+    ir_l_avg, ir_r_avg = ess_method.compute_ir(n_chan,1)
 
     #TODO further computation (averaging and alignment!!!)
 
