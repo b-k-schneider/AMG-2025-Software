@@ -13,9 +13,9 @@ def generate_sds(fs, f_0, f_1, t_meas):
     sds_signal=[]
 
     
-    print "fs=",fs
-    print "f_sine1=",f_0
-    print "f_sine2=",f_1
+    #DEBUG print "fs=",fs
+    #DEBUG print "f_sine1=",f_0
+    #DEBUG print "f_sine2=",f_1
     
     #generate sinewave 1
 
@@ -34,12 +34,12 @@ def generate_sds(fs, f_0, f_1, t_meas):
 
         for i in xrange(len(sine_one)):
             sds_signal.append((sine_one[i]+sine_two[i])/2)
-        print "Debug: Two Sines"
+        #DEBUG print "Debug: Two Sines"
         
     else:
                         
         sds_signal=sine_one
-        print "Debug: Only one Sine"
+        #DEBUG print "Debug: Only one Sine"
 
     return sds_signal
 
@@ -50,7 +50,7 @@ def compute_resp(n_chan):
     import scipy.fftpack
     # if mono, only leftchannels are used
 
-    
+    print "Splitting Channels"
     #Extracting Channels
     resp_l, resp_r, meas_l, meas_r=audio_io.extract_channels(n_chan,0)
     

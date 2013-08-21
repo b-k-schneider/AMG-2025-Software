@@ -129,22 +129,19 @@ def measure_sds(fs,n_chan, f_sine1, f_sine2, t_meas):
     #closing audio device
     audio_io.audio_close()
 
-    resp_l, resp_r = sds_method.compute_ir(n_chan)
-
-    #TODO further computation (averaging and alignment!!!)
+    resp_l, resp_r = sds_method.compute_resp(n_chan)
 
 
+    return (resp_l, resp_r)
 
-    return (ir_l_avg, ir_r_avg)
 
-    return sys_resp
 
 def compute_fft(fs, ir):
 
     import scipy.signal, numpy
     from scipy import fftpack
 
-    # creating asymmetric bartlett window for spectal analysis
+    # creating asymmetric bartlett window for spectral analysis
     window_bart = scipy.signal.bartlett(len(ir),sym=False)
 
     # windowing the impulse response
@@ -188,7 +185,7 @@ def plot_ir(fs, ir, filename):
     
     return
 
-def plot_save_fft(freq, sys_fft, filename):
+def plot_save_fft(freq, sys_fft, filename,avg):
     #Plots FFT as Image
     
     import matplotlib.pyplot as plt
@@ -196,12 +193,16 @@ def plot_save_fft(freq, sys_fft, filename):
     import scipy.signal
 
     # filtering the fft by an average filter
-    
-    avg_fft = scipy.signal.medfilt(sys_fft, 333)
+    if avg>0:
+        print "Average Filtering On"
+        avg_fft = scipy.signal.medfilt(sys_fft, 333)
 
-    # TODO axis Labeling, maybe scaling to frequencies
-    # plt.plot(freq,sys_fft)
-    plt.plot(freq,avg_fft)
+        # TODO axis Labeling, maybe scaling to frequencies
+        plt.plot(freq,avg_fft)
+    else:
+        print "Average Filtering Off"
+        plt.plot(freq,sys_fft)
+
     plt.savefig(filename)
     plt.clf()
     
