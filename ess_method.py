@@ -41,11 +41,13 @@ def compute_ir(n_chan, index):
     meas_fft_l= meas_fft_l/meas_fft_l.size
     inv_meas_l = 1/meas_fft_l
     inv_filter_l =scipy.fftpack.ifft(inv_meas_l)
+    inv_filter_l = inv_filter_l.real
 
     meas_fft_r = scipy.fftpack.fft(meas_r)
     meas_fft_r= meas_fft_r/meas_fft_r.size
     inv_meas_r = 1/meas_fft_r
-    inv_filter_r =scipy.fftpack.ifft(inv_meas_r)    
+    inv_filter_r =scipy.fftpack.ifft(inv_meas_r)
+    inv_filter_r = inv_filter_r.real
 
     #convolve system response with the inverse filter
     ir_l = scipy.signal.fftconvolve(resp_l,inv_filter_l)    
