@@ -110,9 +110,33 @@ def measure_ess(fs, n_meas, n_chan, f_start, f_stop, t_sweep):
     return (ir_l_avg, ir_r_avg)
 
 
-def measure_sds(fs, f_sine1, f_sine2, time):
+def measure_sds(fs,n_chan, f_sine1, f_sine2, t_meas):
 
-    # TODO sds measurement
+     # calls the SDS Measurement
+
+    import sds_method, audio_io, numpy
+    
+    # creating ESS Signal
+    meas_sig = sds_method.generate_sds(fs, f_sine1, f_sine2, t_meas)
+
+    # open audio device
+    audio_io.audio_open(fs,n_chan)
+
+
+    #t_sweep*1000 is half the time to record in ms
+    audio_io.meas_run(fs,n_chan,meas_sig,int(t_meas*1000),0) 
+
+    #closing audio device
+    audio_io.audio_close()
+
+    resp_l, resp_r = sds_method.compute_ir(n_chan)
+
+    #TODO further computation (averaging and alignment!!!)
+
+
+
+    return (ir_l_avg, ir_r_avg)
+
     return sys_resp
 
 def compute_fft(fs, ir):
