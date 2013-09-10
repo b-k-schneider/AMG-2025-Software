@@ -217,14 +217,19 @@ def window_ir(ir):
 
     return ir_win
 
-def plot_ir(fs, ir, filename):
+def plot_save_ir(fs, ir, filename):
     #Plots Impulse Responses as Images
     import matplotlib.pyplot as plt
     import matplotlib.image as mpimg
 
+    png_name="/tmp/amg2025/"+filename+".png"
+    txt_name="/tmp/amg2025/"+filename+".txt"
+
+    numpy.savetxt(txt_name, ir, fmt='%10.5f', delimiter=';', newline='\n', header='Non Windowed Impulse Response', footer='')
+
     # TODO axis Labeling, maybe scaling to time
     plt.plot(ir)
-    plt.savefig(filename)
+    plt.savefig(png_name)
     plt.clf()
     
     return
@@ -237,6 +242,9 @@ def plot_save_fft(freq, sys_fft, filename,avg):
     import matplotlib.image as mpimg
     import scipy.signal
 
+    png_name="/tmp/amg2025/"+filename+".png"
+    txt_name="/tmp/amg2025/"+filename+".txt"
+
     # filtering the fft by an average filter
     if avg>0:
         print "Average Filtering On"
@@ -244,7 +252,7 @@ def plot_save_fft(freq, sys_fft, filename,avg):
 
         #scaling to dB
         avg_fft=20*numpy.log10(avg_fft)
-
+        numpy.savetxt(txt_name, avg_fft, fmt='%10.5f', delimiter=';', newline='\n', header='Averaged FFT', footer='') 
         # TODO axis Labeling, maybe scaling to frequencies
         plt.plot(freq,avg_fft)
     else:
@@ -253,10 +261,12 @@ def plot_save_fft(freq, sys_fft, filename,avg):
         #scaling to dB
 
         sys_fft=20*numpy.log10(sys_fft)
-        
+        numpy.savetxt(txt_name, sys_fft, fmt='%10.5f', delimiter=';', newline='\n', header='Non-Averaged FFT', footer='') 
         plt.plot(freq,sys_fft)
+
+    
     plt.grid(True)
-    plt.savefig(filename)
+    plt.savefig(png_name)
     plt.clf()
     
     return

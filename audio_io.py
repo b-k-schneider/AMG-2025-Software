@@ -60,7 +60,7 @@ def audio_mono_out(sig_meas,fs,n_chan):
 
     
     # save .wav file
-    sf = wave.open("/tmp/meas_mono.wav", 'w')
+    sf = wave.open("/tmp/amg2025/meas_mono.wav", 'w')
     sf.setparams((2, n_chan, fs, 0, 'NONE', 'no compression'))
     sf.writeframesraw(sig_meas)
     sf.close()
@@ -78,7 +78,7 @@ def audio_stereo_out(sig_meas,fs,n_chan):
     #DEBUG print sna
 
     # save .wav file
-    sf = wave.open("/tmp/meas_stereo.wav", 'w')
+    sf = wave.open("/tmp/amg2025/meas_stereo.wav", 'w')
     sf.setparams((2, n_chan, fs, 0, 'NONE', 'no compression'))
     sf.writeframesraw(stereoaudio)
     sf.close()
@@ -97,7 +97,7 @@ def audio_in(rt60,fs,n_chan,index):
 
     frames = []
 
-    filename='/tmp/data_%d.wav'%(index,)
+    filename='/tmp/amg2025/data_%d.wav'%(index,)
 
     n_frames = int(round(((fs / float(chunk)) *(2.5*rt60/1000.0))+0.5))
     
@@ -153,13 +153,13 @@ def extract_channels(n_chan,index):
 
     #extracts data out of both wavefiles into 4 arrays
 
-    filename='/tmp/data_%d.wav'%(index,)
+    filename='/tmp/amg2025/data_%d.wav'%(index,)
     
     #splitting of the tuple
     if n_chan == 2:
-        fs,meas_array = scipy.io.wavfile.read("/tmp/meas_stereo.wav")
+        fs,meas_array = scipy.io.wavfile.read("/tmp/amg2025/meas_stereo.wav")
     else :
-        fs,meas_array = scipy.io.wavfile.read("/tmp/meas_mono.wav")
+        fs,meas_array = scipy.io.wavfile.read("/tmp/amg2025/meas_mono.wav")
 
     fs,resp_array = scipy.io.wavfile.read(filename)
 
