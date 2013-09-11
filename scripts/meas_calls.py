@@ -46,7 +46,7 @@ def average_ir_mls(n_meas, n_chan):
         print "Processing Response No",i
         
         ir_l, ir_r= mls_method.compute_ir(n_chan, i)
-        
+
         #TODO alignment of arrays
         if i>1:
             max_diff_l=(ir_l_raw.argmax(axis=0) - ir_l.argmax(axis=0))
@@ -123,7 +123,12 @@ def average_ir_ess(n_meas, n_chan):
 
         print "Processing Response No",i
         
-        ir_l, ir_r= ess_method.compute_ir(n_chan, i)
+        ir_l_i, ir_r_i= ess_method.compute_ir(n_chan, i)
+
+        
+        ir_l=ir_l_i.copy()
+        ir_r=ir_r_i.copy()
+        
         
         #TODO alignment of arrays
         if i>1:
@@ -223,7 +228,7 @@ def plot_save_ir(fs, ir, filename):
     import matplotlib.pyplot as plt
     import matplotlib.image as mpimg
 
-    png_name="/tmp/amg2025/"+filename+".png"
+    png_name="/tmp/amg2025/"+filename+".jpg"
     txt_name="/tmp/amg2025/"+filename+".txt"
 
     numpy.savetxt(txt_name, ir, fmt='%10.5f', delimiter=';', newline='\n')
@@ -243,9 +248,9 @@ def plot_save_fft(freq, sys_fft, filename,avg):
     import matplotlib.image as mpimg
     import scipy.signal
 
-    png_name="/tmp/amg2025/"+filename+".png"
+    png_name="/tmp/amg2025/"+filename+".jpg"
     txt_name="/tmp/amg2025/"+filename+".txt"
-
+    
     # filtering the fft by an average filter
     if avg>0:
         print "Average Filtering On"

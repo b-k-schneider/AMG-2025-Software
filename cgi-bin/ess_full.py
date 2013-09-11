@@ -12,10 +12,10 @@ import datetime
 d=datetime.date.today()
 d_string=d.isoformat()
 
-fname_ir_l = "mls-ir-l-" + d_string
-fname_fft_l = "mls-fft-l-" + d_string
-fname_ir_r = "mls-ir-r-" + d_string
-fname_fft_r = "mls-fft-r-" + d_string
+fname_ir_l = "ess-ir-l-" + d_string
+fname_fft_l = "ess-fft-l-" + d_string
+fname_ir_r = "ess-ir-r-" + d_string
+fname_fft_r = "ess-fft-r-" + d_string
 
 # Create instance of FieldStorage 
 form = cgi.FieldStorage() 
@@ -36,10 +36,20 @@ if form.getvalue('n_meas'):
 else:
    n_meas = 2
 
-if form.getvalue('rt60'):
-   rt60 = int(form.getvalue('rt60'))
+if form.getvalue('f_0'):
+   f_0 = int(form.getvalue('f_0'))
 else:
-   rt60 = 100
+   f_0 = 20
+
+if form.getvalue('f_1'):
+   f_1 = int(form.getvalue('f_1'))
+else:
+   f_1 = 22000
+   
+if form.getvalue('t_sweep'):
+   t_sweep = int(form.getvalue('t_sweep'))
+else:
+   t_sweep = 5
 
 if form.getvalue('avg_fft'):
     if form.getvalue('avg_fft')=="ON":
@@ -55,16 +65,16 @@ else:
 print "Content-type:text/html\r\n\r\n"
 print '<html>'
 print '<head>'
-print '<title>AMG.2025 - Maximum Length Sequence Measurement</title>'
+print '<title>AMG.2025 - Exponential Sine Sweep Measurement</title>'
 print '</head>'
 
 # Begin of html body
 print '<body>'
 
 # Welcome Message
-print '<h2> Maximum Length Sequence Measurement </h2>'
+print '<h2> Exponential Sine Sweep Measurement </h2>'
 
-ir_l, ir_r = meas_calls.measure_mls(fs,rt60,n_meas,n_chan)
+ir_l, ir_r = meas_calls.measure_ess(fs,n_meas,n_chan,f_0,f_1,t_sweep)
 # Left Channel
 sys_fft_l, freq_l = meas_calls.compute_fft(fs,ir_l)
 meas_calls.plot_save_ir(fs,ir_l,fname_ir_l)

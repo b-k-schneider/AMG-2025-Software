@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
 
 # Import modules for CGI handling 
 import cgi, cgitb
@@ -12,10 +13,8 @@ import datetime
 d=datetime.date.today()
 d_string=d.isoformat()
 
-fname_ir_l = "mls-ir-l-" + d_string
-fname_fft_l = "mls-fft-l-" + d_string
-fname_ir_r = "mls-ir-r-" + d_string
-fname_fft_r = "mls-fft-r-" + d_string
+fname_fft_l = "sds-fft-l-" + d_string
+fname_fft_r = "sds-fft-r-" + d_string
 
 # Create instance of FieldStorage 
 form = cgi.FieldStorage() 
@@ -31,15 +30,20 @@ if form.getvalue('n_chan'):
 else:
    n_chan = 2
 
-if form.getvalue('n_meas'):
-   n_meas = int(form.getvalue('n_meas'))
+if form.getvalue('f_0'):
+   f_0 = int(form.getvalue('f_0'))
 else:
-   n_meas = 2
+   f_0 = 20
 
-if form.getvalue('rt60'):
-   rt60 = int(form.getvalue('rt60'))
+if form.getvalue('f_1'):
+   f_1 = int(form.getvalue('f_1'))
 else:
-   rt60 = 100
+   f_1 = 22000
+   
+if form.getvalue('t_sweep'):
+   t_sweep = int(form.getvalue('t_sweep'))
+else:
+   t_sweep = 5
 
 if form.getvalue('avg_fft'):
     if form.getvalue('avg_fft')=="ON":
@@ -55,34 +59,29 @@ else:
 print "Content-type:text/html\r\n\r\n"
 print '<html>'
 print '<head>'
-print '<title>AMG.2025 - Maximum Length Sequence Measurement</title>'
+print '<title>AMG.2025 - Single/Dual Sine Measurement</title>'
 print '</head>'
 
 # Begin of html body
 print '<body>'
 
 # Welcome Message
-print '<h2> Maximum Length Sequence Measurement </h2>'
+print '<h2> Single/Dual Sine Measurement </h2>'
 
-ir_l, ir_r = meas_calls.measure_mls(fs,rt60,n_meas,n_chan)
+resp_l, resp_r = meas_calls.measure_sds(fs,n_chan,f_0,f_1,t_sweep)
 # Left Channel
-sys_fft_l, freq_l = meas_calls.compute_fft(fs,ir_l)
-meas_calls.plot_save_ir(fs,ir_l,fname_ir_l)
+sys_fft_l, freq_l = meas_calls.compute_fft(fs,resp_l)
 meas_calls.plot_save_fft(freq_l,sys_fft_l,fname_fft_l,avg_fft)
 
 if n_chan>1:
 # Right Channel
-    sys_fft_r, freq_r = meas_calls.compute_fft(fs,ir_r)
-    meas_calls.plot_save_ir(fs,ir_r,fname_ir_r)
+    sys_fft_r, freq_r = meas_calls.compute_fft(fs,resp_r)
     meas_calls.plot_save_fft(freq_r,sys_fft_r,fname_fft_r,avg_fft)
-print '<h3>Left Channel IR</h3>'
-print '<img type="image" src="/tmp/amg2025/%s.jpg" alt="Left Channel IR">' %fname_ir_l
+
 print '<h3>Left Channel FFT</h3>'
 print '<img src="/tmp/amg2025/%s.jpg" alt="Left Channel FFT">' %fname_fft_l
 
 if n_chan>1:
-    print '<h3>Right Channel IR</h3>'
-    print '<img src="/tmp/amg2025/%s.jpg" alt="Right Channel IR">' %fname_ir_r
     print '<h3>Right Channel FFT</h3>'
     print '<img src="/tmp/amg2025/%s.jpg" alt="Right Channel FFT">' %fname_fft_r
 
