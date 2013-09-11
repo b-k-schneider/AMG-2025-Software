@@ -219,13 +219,14 @@ def window_ir(ir):
 
 def plot_save_ir(fs, ir, filename):
     #Plots Impulse Responses as Images
+    import numpy
     import matplotlib.pyplot as plt
     import matplotlib.image as mpimg
 
     png_name="/tmp/amg2025/"+filename+".png"
     txt_name="/tmp/amg2025/"+filename+".txt"
 
-    numpy.savetxt(txt_name, ir, fmt='%10.5f', delimiter=';', newline='\n', header='Non Windowed Impulse Response', footer='')
+    numpy.savetxt(txt_name, ir, fmt='%10.5f', delimiter=';', newline='\n')
 
     # TODO axis Labeling, maybe scaling to time
     plt.plot(ir)
@@ -252,7 +253,7 @@ def plot_save_fft(freq, sys_fft, filename,avg):
 
         #scaling to dB
         avg_fft=20*numpy.log10(avg_fft)
-        numpy.savetxt(txt_name, avg_fft, fmt='%10.5f', delimiter=';', newline='\n', header='Averaged FFT', footer='') 
+        numpy.savetxt(txt_name, avg_fft, fmt='%10.5f', delimiter=';', newline='\n') 
         # TODO axis Labeling, maybe scaling to frequencies
         plt.plot(freq,avg_fft)
     else:
@@ -261,7 +262,7 @@ def plot_save_fft(freq, sys_fft, filename,avg):
         #scaling to dB
 
         sys_fft=20*numpy.log10(sys_fft)
-        numpy.savetxt(txt_name, sys_fft, fmt='%10.5f', delimiter=';', newline='\n', header='Non-Averaged FFT', footer='') 
+        numpy.savetxt(txt_name, sys_fft, fmt='%10.5f', delimiter=';', newline='\n') 
         plt.plot(freq,sys_fft)
 
     
