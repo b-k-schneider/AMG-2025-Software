@@ -233,6 +233,8 @@ def plot_save_ir(fs, ir, filename):
 
     numpy.savetxt(txt_name, ir, fmt='%10.5f', delimiter=';', newline='\n')
 
+    plt.xlabel('Samples')
+    plt.ylabel('Value')
     # TODO axis Labeling, maybe scaling to time
     plt.plot(ir)
     plt.savefig(png_name)
@@ -265,11 +267,14 @@ def plot_save_fft(freq, sys_fft, filename,avg):
         print "Average Filtering Off"
 
         #scaling to dB
-
         sys_fft=20*numpy.log10(sys_fft)
         numpy.savetxt(txt_name, sys_fft, fmt='%10.5f', delimiter=';', newline='\n') 
         plt.plot(freq,sys_fft)
 
+
+    plt.xlabel('Frequency in Hz')
+    plt.ylabel('dB')
+    plt.xscale('log')
     
     plt.grid(True)
     plt.savefig(png_name)
