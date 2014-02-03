@@ -112,8 +112,7 @@ def audio_in(rt60,fs,n_chan,index):
     sys_wav.close()
 
     del(frames)
-    
-    
+        
     return 
 
 
