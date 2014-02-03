@@ -16,6 +16,6 @@ add symbolic link in your directory where your python cgiserver lives to tmp:
 $: ln -s /tmp tmp
 
 cgi-server.py and also all scripts in the cgi-bin folder must be marked as execute
-$: chmod +x cgi-server.py
+$: chmod +x cgi-server.py start_up.sh
 in cgi-bin/:
 $: chmod +x  amg_2025.py ess_full.py mls_full.py sds_full.py selection.py 
