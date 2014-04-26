@@ -61,7 +61,7 @@ def audio_mono_out(sig_meas,fs,n_chan):
     
     # save .wav file
     sf = wave.open("/tmp/amg2025/meas_mono.wav", 'w')
-    sf.setparams((2, n_chan, fs, 0, 'NONE', 'no compression'))
+    sf.setparams((n_chan, 2, fs, 0, 'NONE', 'no compression'))
     sf.writeframesraw(sig_meas)
     sf.close()
 
@@ -79,7 +79,7 @@ def audio_stereo_out(sig_meas,fs,n_chan):
 
     # save .wav file
     sf = wave.open("/tmp/amg2025/meas_stereo.wav", 'w')
-    sf.setparams((2, n_chan, fs, 0, 'NONE', 'no compression'))
+    sf.setparams((n_chan, 2, fs, 0, 'NONE', 'no compression'))
     sf.writeframesraw(stereoaudio)
     sf.close()
 
@@ -107,7 +107,7 @@ def audio_in(rt60,fs,n_chan,index):
     
     # recording to .wav file
     sys_wav = wave.open(filename, 'w')
-    sys_wav.setparams((2, n_chan, fs, 0, 'NONE', 'no compression'))
+    sys_wav.setparams((n_chan, 2, fs, 0, 'NONE', 'no compression'))
     sys_wav.writeframes(b''.join(frames))
     sys_wav.close()
 

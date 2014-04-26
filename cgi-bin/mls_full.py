@@ -16,6 +16,10 @@ fname_ir_l = "mls-ir-l-" + d_string
 fname_fft_l = "mls-fft-l-" + d_string
 fname_ir_r = "mls-ir-r-" + d_string
 fname_fft_r = "mls-fft-r-" + d_string
+fname_zip = "mls-measurement" + d_string
+
+# Clearing the tmp directory
+meas_calls.clear_tmp()
 
 # Create instance of FieldStorage 
 form = cgi.FieldStorage() 
@@ -75,6 +79,8 @@ if n_chan>1:
     sys_fft_r, freq_r = meas_calls.compute_fft(fs,ir_r)
     meas_calls.plot_save_ir(fs,ir_r,fname_ir_r)
     meas_calls.plot_save_fft(freq_r,sys_fft_r,fname_fft_r,avg_fft)
+
+meas_calls.make_zip(fname_zip)    
 print '<h3>Left Channel IR</h3>'
 print '<img type="image" src="/tmp/amg2025/%s.jpg" alt="Left Channel IR">' %fname_ir_l
 print '<h3>Left Channel FFT</h3>'
@@ -85,6 +91,12 @@ if n_chan>1:
     print '<img src="/tmp/amg2025/%s.jpg" alt="Right Channel IR">' %fname_ir_r
     print '<h3>Right Channel FFT</h3>'
     print '<img src="/tmp/amg2025/%s.jpg" alt="Right Channel FFT">' %fname_fft_r
+
+# Zipfile Download Button
+
+print '<form method="get" action="/tmp/amg2025/%s.zip">' %fname_zip
+print '<button type="submit">Download</button>'
+print '</form>'
 
 print '</body>'
 print '</html>'

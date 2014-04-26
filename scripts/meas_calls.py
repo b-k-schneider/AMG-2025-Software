@@ -227,18 +227,34 @@ def plot_save_ir(fs, ir, filename):
     import numpy
     import matplotlib.pyplot as plt
     import matplotlib.image as mpimg
+    import wave
+    import audio_io
 
     png_name="/tmp/amg2025/"+filename+".jpg"
     txt_name="/tmp/amg2025/"+filename+".txt"
-
+    wav_name="/tmp/amg2025/"+filename+".wav"
+    
     numpy.savetxt(txt_name, ir, fmt='%10.5f', delimiter=';', newline='\n')
 
     plt.xlabel('Samples')
     plt.ylabel('Value')
-    # TODO axis Labeling, maybe scaling to time
+    
     plt.plot(ir)
     plt.savefig(png_name)
     plt.clf()
+
+    adjust=29205.0/float(ir[ir.argmax()])
+
+    # save .wav file
+    sf = wave.open(wav_name, 'w')
+    sf.setparams((1, 2, fs, 0, 'NONE', 'no compression'))
+    
+    for j in range(len(ir)):
+        ir_wav = wave.struct.pack('<h', int(ir[j]*adjust))
+        sf.writeframesraw(ir_wav)
+
+
+    sf.close()
     
     return
 
@@ -283,5 +299,50 @@ def plot_save_fft(freq, sys_fft, filename,avg):
     return
 
 
+def make_zip(file_name):
+    import zipfile
+    import os
+    import shutil
+    # Packing the results in a Zip File
+
+    zip_name="/tmp/"+file_name+".zip"
+
+    zf=zipfile.ZipFile(zip_name, "w")
     
+    folder="/tmp/amg2025/"
     
+    for the_file in os.listdir(folder):
+    
+        if the_file==zip_name:
+            print "bla"
+
+        else:
+            file_path=os.path.join(folder,the_file)
+
+            if os.path.isfile(file_path):
+                zf.write(file_path)
+            
+    zf.close()
+
+    shutil.move(zip_name,folder)
+
+    return
+    
+def clear_tmp():
+    # Clearing the tmp folder
+
+    import os
+
+    folder="/tmp/amg2025/"
+    for the_file in os.listdir(folder):
+        file_path=os.path.join(folder,the_file)
+        try:
+            if os.path.isfile(file_path):
+                os.unlink(file_path)
+        except Exception, e:
+            print e
+
+    return
+
+
+
